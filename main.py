@@ -9,7 +9,7 @@ def find_replace_array(file_data, a):
         file_data = re.sub(search_pattern, replacement, file_data)
     return file_data
 
-def process(file_data):
+def process(file_data: str) -> str:
     file_data = find_replace_array(file_data, [
     (
         r'\[Command(\(.*\))?\]',
@@ -68,6 +68,16 @@ def process(file_data):
         r'\1[NetworkMessage]\n\1\2',
     )
     ])
+
+    if "NetworkBehaviourWithOverrides" in file_data:
+        file_data = find_replace(file_data, 
+            r'(public|protected|private|internal) (virtual )?void Awake\(\)',
+            r'protected override void Awake()'
+        )
+    file_data = find_replace(file_data, 
+        r'public override void (OnStartServer|OnStartClient|OnStartLocalPlayer|OnStopClient)\(\)',
+        r'protected override void \1()'
+    )
 
     file_data = find_replace(file_data, 
         r'using Mirror;',
